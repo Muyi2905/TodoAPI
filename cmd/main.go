@@ -31,7 +31,7 @@ func main() {
 	r := gin.Default()
 	err := r.Run()
 	if err != nil {
-		fmt.Errorf("error starting server %v", err)
+		fmt.Println("error starting server")
 	}
 	db.AutoMigrate(models.Todo{}, models.User{})
 }

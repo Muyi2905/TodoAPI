@@ -6,14 +6,13 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+
 	"github.com/muyi2905/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var db *gorm.DB
-var validate *validator.Validate
 
 func initDb() {
 	dsn := os.Getenv("DSN")
@@ -30,11 +29,11 @@ func initDb() {
 
 func main() {
 	initDb()
+	db.AutoMigrate(models.Todo{}, models.User{})
 	r := gin.Default()
 	err := r.Run()
 	if err != nil {
 		fmt.Println("error starting server")
 	}
-	db.AutoMigrate(models.Todo{}, models.User{})
 
 }

@@ -55,3 +55,20 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		"message": "user created sucessful",
 	})
 }
+
+func GetUserById(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+
+	var user models.User
+
+	if err := db.First(&user, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "user not found"})
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch user"})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"user": "user",
+	})
+}

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/muyi2905/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -34,4 +35,18 @@ func main() {
 		fmt.Println("error starting server")
 	}
 	db.AutoMigrate(models.Todo{}, models.User{})
+
+	validate := validator.New()
+	user := models.User{
+		Email:    "obaremimuyiwa@gmail.com",
+		Password: "74ydbhduudu",
+	}
+	if err := validate.Struct(user); err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Println(err.StructField(), err.Tag(), err.Param())
+		}
+	} else {
+		fmt.Println("validation passed")
+	}
+
 }

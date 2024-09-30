@@ -11,6 +11,20 @@ import (
 
 var validate = validator.New()
 
+func GetUsers(c *gin.Context, db *gorm.DB) {
+	var users []models.User
+
+	if err := db.Find(&users).Error; err != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+	})
+}
+
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -36,8 +50,8 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 			"error": "failed to create user",
 		})
 	}
-	return
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "user created sucessful",
+	})
 }
-
-
-func 

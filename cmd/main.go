@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/muyi2905/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -32,5 +33,5 @@ func main() {
 	if err != nil {
 		fmt.Errorf("error starting server %v", err)
 	}
-
+	db.AutoMigrate(models.Todo{}, models.User{})
 }

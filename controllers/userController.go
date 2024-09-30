@@ -38,3 +38,6 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 	}
 	return
 }
+
+
+func 

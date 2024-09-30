@@ -10,5 +10,8 @@ func TodoRoutes(r *gin.Engine, db *gorm.DB) {
 	{
 		r.GET("/", controllers.GetTodo)
 		r.GET("/:id", controllers.GetTodoById)
+		r.POST("/", controllers.CreateTask)
+		r.PUT("/:id", controllers.UpdateTask)
+		r.DELETE("/:id", controllers.DeleteTask)
 	}
 }

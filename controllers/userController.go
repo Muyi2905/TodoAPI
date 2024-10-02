@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"go/token"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -15,7 +17,7 @@ import (
 var validate = validator.New()
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
-type claims struct {
+type Claims struct {
 	UserId uint `json:"user_id"`
 	jwt.StandardClaims
 }
@@ -160,5 +162,20 @@ func Signup(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 		return
 	}
+
+	claims := &Claims{
+		UserId: user.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 
 }

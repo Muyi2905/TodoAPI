@@ -3,11 +3,13 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/muyi2905/controllers"
+	"github.com/muyi2905/middleware"
 	"gorm.io/gorm"
 )
 
 func UserRoutes(r *gin.Engine, db *gorm.DB) {
 	r.Group("/api/v1/users")
+	r.Use(middleware.AuthMiddleware())
 	{
 		r.GET("/", func(c *gin.Context) { controllers.GetUsers(c, db) })
 		r.GET("/:id", func(c *gin.Context) { controllers.GetUserById(c, db) })

@@ -2,14 +2,23 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/muyi2905/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 var validate = validator.New()
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+type claims struct {
+	UserId uint `json:"user_id"`
+	jwt.StandardClaims
+}
 
 func GetUsers(c *gin.Context, db *gorm.DB) {
 	var users []models.User
@@ -129,7 +138,27 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 func Signup(c *gin.Context, db *gorm.DB) {
 	var user models.User
 
-	if err := validate.Struct(&user); err != nil {
-c.JSON(http.StatusBadRequest,gin.H{ "error" : validate. })
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
 	}
+
+	if err := validate.Struct(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to hash password"})
+		return
+	}
+	user.Password = string(hashedPassword)
+
+	if err := db.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		return
+	}
+
 }

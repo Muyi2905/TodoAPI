@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/muyi2905/models"
+	"github.com/muyi2905/routes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -31,6 +32,7 @@ func main() {
 	initDb()
 	db.AutoMigrate(models.Todo{}, models.User{})
 	r := gin.Default()
+	routes.RegisterRoutes(r, db)
 	err := r.Run(":8080")
 	if err != nil {
 		fmt.Println("error starting server")

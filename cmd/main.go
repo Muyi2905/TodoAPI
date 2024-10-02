@@ -31,7 +31,7 @@ func main() {
 	initDb()
 	db.AutoMigrate(models.Todo{}, models.User{})
 	r := gin.Default()
-	err := r.Run()
+	err := r.Run(":8080")
 	if err != nil {
 		fmt.Println("error starting server")
 	}

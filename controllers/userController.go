@@ -125,3 +125,11 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
 }
+
+func Signup(c *gin.Context, db *gorm.DB) {
+	var user models.User
+
+	if err := validate.Struct(&user); err != nil {
+c.JSON(http.StatusBadRequest,gin.H{ "error" : validate. })
+	}
+}

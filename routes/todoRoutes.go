@@ -9,7 +9,7 @@ import (
 func TodoRoutes(r *gin.Engine, db *gorm.DB) {
 	r.Group("/api/v1/todo")
 	{
-		r.GET("/", func(ctx *gin.Context) { controllers.GetTodo(ctx, db) })
+		r.GET("/", func(c *gin.Context) { controllers.GetTodo(c, db) })
 		r.GET("/:id", controllers.GetTodoById)
 		r.POST("/", controllers.CreateTask)
 		r.PUT("/:id", controllers.UpdateTask)

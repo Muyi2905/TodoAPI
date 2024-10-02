@@ -1,7 +1,17 @@
-# Your Project Name
+# Golang Todo-Api 
 
 ## Description
-Brief description of your project. What does it do? What problem does it solve?
+The Golang Todo-Api is a robust and efficient RESTful API built using Go (Golang) and the Gin web framework. This project provides a backend service for managing todo tasks, allowing users to create, read, update, and delete todo items. It features user authentication using JWT tokens, ensuring secure access to personal todo lists.
+
+Key features include:
+- RESTful API endpoints for todo CRUD operations
+- User authentication and authorization
+- JWT-based secure routes
+- Database integration for persistent storage
+- Middleware for request logging and error handling
+- Scalable and modular codebase structure
+
+This API serves as an excellent backend for todo list applications, providing a solid foundation that can be easily extended or integrated with various frontend technologies.
 
 ## Table of Contents
 - [Installation](#installation)

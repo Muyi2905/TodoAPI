@@ -103,4 +103,25 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 	}
 
+	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
+}
+
+func DeleteUser(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+
+	var user models.User
+
+	if err := db.First(user, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"err": "user not found"})
+		}
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+	}
+
+	if err := db.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
 }

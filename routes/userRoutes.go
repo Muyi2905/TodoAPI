@@ -15,6 +15,6 @@ func UserRoutes(r *gin.Engine, db *gorm.DB) {
 		r.PUT("/:id", func(c *gin.Context) { controllers.UpdateUser(c, db) })
 		r.DELETE("/:id", func(c *gin.Context) { controllers.DeleteUser(c, db) })
 		r.POST("/signup", func(c *gin.Context) { controllers.Signup(c, db) })
-		r.POST("/login", func(c *gin.Context) { controllers.Login }(c, db))
+		r.POST("login", func(c *gin.Context) { controllers.Login(c, db) })
 	}
 }

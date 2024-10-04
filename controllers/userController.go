@@ -30,9 +30,41 @@ func GetUsers(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return
 	}
+	// Pagination
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	offset := (page - 1) * pageSize
+
+	// Filtering
+	name := c.Query("name")
+	email := c.Query("email")
+
+	query := db.Model(&models.User{})
+
+	if name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
+	}
+	if email != "" {
+		query = query.Where("email LIKE ?", "%"+email+"%")
+	}
+
+	var total int64
+	query.Count(&total)
+
+	// Execute query with pagination
+	if err := query.Offset(offset).Limit(pageSize).Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"users": users,
+		"pagination": gin.H{
+			"current_page": page,
+			"page_size":    pageSize,
+			"total_pages":  (int(total) + pageSize - 1) / pageSize,
+			"total_items":  total,
+		},
 	})
 }
 

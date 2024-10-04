@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/muyi2905/models"
 	"github.com/muyi2905/routes"
@@ -16,6 +17,10 @@ import (
 var db *gorm.DB
 
 func initDb() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("error loading .env file")
+	}
+
 	dsn := os.Getenv("DSN")
 	if dsn == "" {
 		panic("dsn envireonment variable is not set")

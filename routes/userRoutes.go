@@ -8,15 +8,19 @@ import (
 )
 
 func UserRoutes(r *gin.Engine, db *gorm.DB) {
-	r.Group("/api/v1/users")
-	r.Use(middleware.AuthMiddleware())
+	userGroup := r.Group("/api/v1/users")
+	userGroup.Use(middleware.AuthMiddleware())
 	{
-		r.GET("/", func(c *gin.Context) { controllers.GetUsers(c, db) })
-		r.GET("/:id", func(c *gin.Context) { controllers.GetUserById(c, db) })
-		r.POST("/", func(c *gin.Context) { controllers.CreateUser(c, db) })
-		r.PUT("/:id", func(c *gin.Context) { controllers.UpdateUser(c, db) })
-		r.DELETE("/:id", func(c *gin.Context) { controllers.DeleteUser(c, db) })
-		r.POST("/signup", func(c *gin.Context) { controllers.Signup(c, db) })
-		r.POST("login", func(c *gin.Context) { controllers.Login(c, db) })
+		userGroup.GET("", func(c *gin.Context) { controllers.GetUsers(c, db) })
+		userGroup.GET("/:id", func(c *gin.Context) { controllers.GetUserById(c, db) })
+		userGroup.POST("", func(c *gin.Context) { controllers.CreateUser(c, db) })
+		userGroup.PUT("/:id", func(c *gin.Context) { controllers.UpdateUser(c, db) })
+		userGroup.DELETE("/:id", func(c *gin.Context) { controllers.DeleteUser(c, db) })
+	}
+
+	authGroup := r.Group("/api/v1/auth")
+	{
+		authGroup.POST("/signup", func(c *gin.Context) { controllers.Signup(c, db) })
+		authGroup.POST("/login", func(c *gin.Context) { controllers.Login(c, db) })
 	}
 }

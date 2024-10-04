@@ -18,7 +18,7 @@ func UserRoutes(r *gin.Engine, db *gorm.DB) {
 		userGroup.DELETE("/:id", func(c *gin.Context) { controllers.DeleteUser(c, db) })
 	}
 
-	authGroup := r.Group("/api/v1/auth")
+	authGroup := r.Group("/api/v1/users")
 	{
 		authGroup.POST("/signup", func(c *gin.Context) { controllers.Signup(c, db) })
 		authGroup.POST("/login", func(c *gin.Context) { controllers.Login(c, db) })

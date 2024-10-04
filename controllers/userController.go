@@ -214,40 +214,48 @@ func Signup(c *gin.Context, db *gorm.DB) {
 }
 
 func Login(c *gin.Context, db *gorm.DB) {
-	var cretendials struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+	var credentials struct {
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required"`
 	}
 
-	if err := c.ShouldBindJSON(&cretendials); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-	}
-	var user models.User
-	if err := db.Where("email = ?", cretendials).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"err": "invalid email or password"})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to retrive user"})
-		}
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(cretendials.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"err": "inavlid email or password"})
+	if err := c.ShouldBindJSON(&credentials); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	var user models.User
+	result := db.Where("email = ?", credentials.Email).First(&user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		}
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	token, err := generateJWTToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func generateJWTToken(userID uint) (string, error) {
 	claims := &Claims{
-		UserId: user.ID,
+		UserId: userID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
-
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
-
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }

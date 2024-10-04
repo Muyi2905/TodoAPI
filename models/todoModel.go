@@ -6,4 +6,6 @@ type Todo struct {
 	gorm.Model
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Completed   bool   `json:"completed"`
+	UserId      uint   `json:"user_id"`
 }

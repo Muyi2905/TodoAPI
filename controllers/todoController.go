@@ -65,3 +65,43 @@ func UpdateTodo(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Todo updated successfully", "todo": todo})
 }
+
+func GetTodoById(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	userId, _ := c.Get("userId")
+
+	var todo models.Todo
+	if err := db.Where("id = ? AND user_id = ?", id, userId).First(&todo).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch todo"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"todo": todo})
+}
+
+func DeleteTodo(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	userId, _ := c.Get("user_id")
+
+	var todo models.Todo
+
+	if err := db.Where("id = ? AND user_id = ?", id, userId).First(&todo).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch todo"})
+		}
+		return
+	}
+
+	if err := db.Delete(&todo).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting todo"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Todo deleted successfully"})
+}
